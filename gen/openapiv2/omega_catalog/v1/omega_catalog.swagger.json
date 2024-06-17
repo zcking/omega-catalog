@@ -1,0 +1,2004 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Omega Catalog API",
+    "description": "Omega Catalog: one catalog to rule them all, one catalog to find them, one catalog to bring them all, and in the darkness find them",
+    "version": "0.0.1",
+    "license": {
+      "name": "Apache 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0"
+    }
+  },
+  "tags": [
+    {
+      "name": "Volumes",
+      "description": "Volumes are a Omega Catalog capability for accessing, storing, governing, organizing and processing files. Use cases include running machine learning on unstructured data such as image, audio, video, or PDF files, organizing data sets during the data exploration stages in data science, working with libraries that require access to the local file system on cluster machines, storing library and config files of arbitrary formats such as .whl or .txt centrally and providing secure access across workspaces to it, or transforming and querying non-tabular data files in ETL."
+    },
+    {
+      "name": "Catalogs",
+      "description": "A catalog is the first layer of Omega Catalog's three-level namespace. It's used to organize your data assets."
+    },
+    {
+      "name": "Schemas",
+      "description": "A schema (also called a database) is the second layer of Omega Catalog's three-level namespace. A schema organizes tables, volumes and functions."
+    },
+    {
+      "name": "Tables",
+      "description": "A table resides in the third layer of Omega Catalog's three-level namespace. It contains rows of data. A table can be managed or external."
+    },
+    {
+      "name": "Functions",
+      "description": "Functions implement User-Defined Functions (UDFs) in Omega Catalog. The function implementation can be a SQL expression/query or a python function, and it can be invoked wherever a table reference is allowed in a query. In Omega Catalog, a function resides at the same level as a table, so it can be referenced with the form catalog_name.schema_name.function_name."
+    },
+    {
+      "name": "OmegaCatalogService"
+    }
+  ],
+  "host": "localhost:8080",
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/api/v1/catalogs": {
+      "get": {
+        "summary": "List catalogs",
+        "description": "Lists the available catalogs. There is no guarantee of a specific ordering of the elements in the list.",
+        "operationId": "listCatalogs",
+        "responses": {
+          "200": {
+            "description": "The catalog list was successfully retrieved",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "#/definitions/v1Catalog"
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "pageToken",
+            "description": "Opaque pagination token to go to the next page on previous query",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "maxResults",
+            "description": "Maximum number of catalogs to return.\n- when set to a value greater than 0, the page length is the maximum;\n- when set to 0, the page length is set to a server configured value;\n- when set to a value less than 0, an invalid parameter error is returned;",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "tags": [
+          "Catalogs"
+        ]
+      },
+      "post": {
+        "summary": "Create a new catalog",
+        "description": "Create a new catalog instance.",
+        "operationId": "OmegaCatalogService_CreateCatalog",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/v1Catalog"
+            }
+          },
+          "201": {
+            "description": "The new catalog was successfully created",
+            "schema": {}
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "description": "CreateCatalogRequest is the request message for the CreateCatalog API.",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1CreateCatalogRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Catalogs"
+        ]
+      }
+    },
+    "/api/v1/catalogs/{name}": {
+      "get": {
+        "summary": "Get a catalog",
+        "description": "Get the specified catalog.",
+        "operationId": "getCatalog",
+        "responses": {
+          "200": {
+            "description": "The catalog was successfully retrieved",
+            "schema": {
+              "$ref": "#/definitions/v1GetCatalogResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Catalogs"
+        ]
+      },
+      "delete": {
+        "summary": "Delete a catalog",
+        "description": "Delete the specified catalog.",
+        "operationId": "deleteCatalog",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1DeleteCatalogResponse"
+            }
+          },
+          "204": {
+            "description": "The catalog was successfully deleted",
+            "schema": {}
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "name",
+            "description": "The name of the catalog to delete.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "force",
+            "description": "If set to true, the catalog will be deleted even if it is not empty.",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          }
+        ],
+        "tags": [
+          "Catalogs"
+        ]
+      },
+      "patch": {
+        "summary": "Update a catalog",
+        "description": "Update the catalog that matches the specified name.",
+        "operationId": "updateCatalog",
+        "responses": {
+          "200": {
+            "description": "The catalog was successfully updated",
+            "schema": {
+              "$ref": "#/definitions/v1UpdateCatalogResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "name",
+            "description": "The name of the catalog to update.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/OmegaCatalogServiceUpdateCatalogBody"
+            }
+          }
+        ],
+        "tags": [
+          "Catalogs"
+        ]
+      }
+    },
+    "/api/v1/functions": {
+      "get": {
+        "summary": "List functions",
+        "description": "Lists the available functions under the parent catalog and schema. There is no guarantee of a specific ordering of the elements in the list.",
+        "operationId": "listFunctions",
+        "responses": {
+          "200": {
+            "description": "The function list was successfully retrieved",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "#/definitions/v1FunctionInfo"
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "pageToken",
+            "description": "Opaque pagination token to go to the next page on previous query",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "maxResults",
+            "description": "Maximum number of functions to return.\n- when set to a value greater than 0, the page length is the maximum;\n- when set to 0, the page length is set to a server configured value;\n- when set to a value less than 0, an invalid parameter error is returned;",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "catalogName",
+            "description": "The identifier of the catalog.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "schemaName",
+            "description": "The identifier of the schema.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Functions"
+        ]
+      },
+      "post": {
+        "summary": "Create a new function. WARNING: this API is experimental and will change in future versions.",
+        "description": "Create a new function. WARNING: this API is experimental and will change in future versions.",
+        "operationId": "OmegaCatalogService_CreateFunction",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/v1FunctionInfo"
+            }
+          },
+          "201": {
+            "description": "The new function was successfully created",
+            "schema": {}
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1CreateFunctionRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Functions"
+        ]
+      }
+    },
+    "/api/v1/functions/{name}": {
+      "get": {
+        "summary": "Get a function",
+        "description": "Get the specified function from the parent catalog and schema.",
+        "operationId": "getFunction",
+        "responses": {
+          "200": {
+            "description": "The function was successfully retrieved",
+            "schema": {
+              "$ref": "#/definitions/v1GetFunctionResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "name",
+            "description": "The three-level (fully qualified) name of the function.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Functions"
+        ]
+      },
+      "delete": {
+        "summary": "Delete a function",
+        "description": "Delete the specified function from the parent catalog and schema.",
+        "operationId": "deleteFunction",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1DeleteFunctionResponse"
+            }
+          },
+          "204": {
+            "description": "The function was successfully deleted",
+            "schema": {}
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "name",
+            "description": "The three-level (fully qualified) name of the function.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Functions"
+        ]
+      }
+    },
+    "/api/v1/schemas": {
+      "get": {
+        "summary": "List schemas",
+        "description": "Lists the available schemas under the parent catalog. There is no guarantee of a specific ordering of the elements in the list.",
+        "operationId": "listSchemas",
+        "responses": {
+          "200": {
+            "description": "The schema list was successfully retrieved",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "#/definitions/omega_catalogv1Schema"
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "pageToken",
+            "description": "Opaque pagination token to go to the next page on previous query",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "maxResults",
+            "description": "Maximum number of schemas to return.\n- when set to a value greater than 0, the page length is the maximum;\n- when set to 0, the page length is set to a server configured value;\n- when set to a value less than 0, an invalid parameter error is returned;",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "catalogName",
+            "description": "Name of parent catalog for schemas of interest.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Schemas"
+        ]
+      },
+      "post": {
+        "summary": "Create a new schema",
+        "description": "Create a new schema in the specified catalog.",
+        "operationId": "OmegaCatalogService_CreateSchema",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/omega_catalogv1Schema"
+            }
+          },
+          "201": {
+            "description": "The new schema was successfully created",
+            "schema": {}
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1CreateSchemaRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Schemas"
+        ]
+      }
+    },
+    "/api/v1/schemas/{fullName}": {
+      "get": {
+        "summary": "Get a schema",
+        "description": "Get the specified schema for a catalog.",
+        "operationId": "getSchema",
+        "responses": {
+          "200": {
+            "description": "The schema was successfully retrieved",
+            "schema": {
+              "$ref": "#/definitions/v1GetSchemaResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "fullName",
+            "description": "Full name of the schema.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Schemas"
+        ]
+      },
+      "delete": {
+        "summary": "Delete a schema",
+        "description": "Delete the specified schema from the parent catalog.",
+        "operationId": "deleteSchema",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1DeleteSchemaResponse"
+            }
+          },
+          "204": {
+            "description": "The schema was successfully deleted",
+            "schema": {}
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "fullName",
+            "description": "Full name of the schema.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Schemas"
+        ]
+      },
+      "patch": {
+        "summary": "Update a schema",
+        "description": "Update the specified schema under the specified parent catalog. Currently only the name or the comment of the schema could be updated.",
+        "operationId": "updateSchema",
+        "responses": {
+          "200": {
+            "description": "The schema was successfully updated",
+            "schema": {
+              "$ref": "#/definitions/v1UpdateSchemaResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "fullName",
+            "description": "Full name of the schema.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/OmegaCatalogServiceUpdateSchemaBody"
+            }
+          }
+        ],
+        "tags": [
+          "Schemas"
+        ]
+      }
+    },
+    "/api/v1/tables": {
+      "get": {
+        "summary": "List tables",
+        "description": "Gets the list of all available tables under the parent catalog and schema. There is no guarantee of a specific ordering of the elements in the list.",
+        "operationId": "listTables",
+        "responses": {
+          "200": {
+            "description": "The table list was successfully retrieved",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "#/definitions/v1Table"
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "pageToken",
+            "description": "Opaque pagination token to go to the next page on previous query",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "maxResults",
+            "description": "Maximum number of tables to return.\n- when set to a value greater than 0, the page length is the maximum;\n- when set to 0, the page length is set to a server configured value;\n- when set to a value less than 0, an invalid parameter error is returned;",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "catalogName",
+            "description": "Name of parent catalog for tables of interest.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "schemaName",
+            "description": "Parent schema of tables.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Tables"
+        ]
+      },
+      "post": {
+        "summary": "Create a new table. WARNING: this API is experimental and will change in future versions",
+        "description": "Create a new table. WARNING: this API is experimental and will change in future versions",
+        "operationId": "OmegaCatalogService_CreateTable",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/v1Table"
+            }
+          },
+          "201": {
+            "description": "The new table was successfully created",
+            "schema": {}
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "description": "CreateTableRequest is the request message for the CreateTable API.",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1CreateTableRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Tables"
+        ]
+      }
+    },
+    "/api/v1/tables/{fullName}": {
+      "get": {
+        "summary": "Get a table",
+        "description": "Get the specified table.",
+        "operationId": "getTable",
+        "responses": {
+          "200": {
+            "description": "The table was successfully retrieved",
+            "schema": {
+              "$ref": "#/definitions/v1GetTableResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "fullName",
+            "description": "Full name of the table.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Tables"
+        ]
+      },
+      "delete": {
+        "summary": "Delete a table",
+        "description": "Delete the specified table.",
+        "operationId": "deleteTable",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1DeleteTableResponse"
+            }
+          },
+          "204": {
+            "description": "The table was successfully deleted",
+            "schema": {}
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "fullName",
+            "description": "Full name of the table.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Tables"
+        ]
+      }
+    },
+    "/api/v1/volumes": {
+      "get": {
+        "summary": "List volumes",
+        "description": "Lists the available volumes under the parent catalog and schema. There is no guarantee of a specific ordering of the elements in the list.",
+        "operationId": "listVolumes",
+        "responses": {
+          "200": {
+            "description": "The volume list was successfully retrieved",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "#/definitions/v1Volume"
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "pageToken",
+            "description": "Opaque pagination token to go to the next page on previous query",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "maxResults",
+            "description": "Maximum number of volumes to return.\n- when set to a value greater than 0, the page length is the maximum;\n- when set to 0, the page length is set to a server configured value;\n- when set to a value less than 0, an invalid parameter error is returned;",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "catalogName",
+            "description": "The identifier of the catalog.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "schemaName",
+            "description": "The identifier of the schema.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Volumes"
+        ]
+      },
+      "post": {
+        "summary": "Create a new volume",
+        "description": "Create a new volume.",
+        "operationId": "OmegaCatalogService_CreateVolume",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/v1Volume"
+            }
+          },
+          "201": {
+            "description": "The new volume was successfully created",
+            "schema": {}
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "description": "CreateVolumeRequest is the request message for the CreateVolume API.",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1CreateVolumeRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Volumes"
+        ]
+      }
+    },
+    "/api/v1/volumes/{name}": {
+      "get": {
+        "summary": "Get a volume",
+        "description": "Gets a volume for a specific catalog and schema.",
+        "operationId": "getVolume",
+        "responses": {
+          "200": {
+            "description": "The volume was successfully retrieved",
+            "schema": {
+              "$ref": "#/definitions/v1GetVolumeResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "name",
+            "description": "The three-level (fully qualified) name of the volume.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Volumes"
+        ]
+      },
+      "delete": {
+        "summary": "Delete a volume",
+        "description": "Delete a volume from the specified catalog and schema.",
+        "operationId": "deleteVolume",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1DeleteVolumeResponse"
+            }
+          },
+          "204": {
+            "description": "The volume was successfully deleted",
+            "schema": {}
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "name",
+            "description": "The three-level (fully qualified) name of the volume.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Volumes"
+        ]
+      },
+      "patch": {
+        "summary": "Update a volume",
+        "description": "Update the specified volume under the specified parent catalog and schema. Currently only the name or the comment of the volume could be updated.",
+        "operationId": "updateVolume",
+        "responses": {
+          "200": {
+            "description": "The volume was successfully updated",
+            "schema": {
+              "$ref": "#/definitions/v1UpdateVolumeResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "name",
+            "description": "The three-level (fully qualified) name of the volume.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/OmegaCatalogServiceUpdateVolumeBody"
+            }
+          }
+        ],
+        "tags": [
+          "Volumes"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "OmegaCatalogServiceUpdateCatalogBody": {
+      "type": "object",
+      "properties": {
+        "comment": {
+          "type": "string",
+          "description": "The new comment for the catalog."
+        },
+        "newName": {
+          "type": "string",
+          "description": "The new name for the catalog, if renaming it."
+        },
+        "properties": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "The new properties for the catalog."
+        }
+      }
+    },
+    "OmegaCatalogServiceUpdateSchemaBody": {
+      "type": "object",
+      "properties": {
+        "comment": {
+          "type": "string",
+          "description": "The new comment for the schema."
+        },
+        "newName": {
+          "type": "string",
+          "description": "The new name for the schema, if renaming it."
+        },
+        "properties": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "The new properties for the schema."
+        }
+      }
+    },
+    "OmegaCatalogServiceUpdateVolumeBody": {
+      "type": "object",
+      "properties": {
+        "comment": {
+          "type": "string",
+          "description": "The new comment for the volume."
+        },
+        "newName": {
+          "type": "string",
+          "description": "The new name for the volume, if renaming it."
+        }
+      }
+    },
+    "omega_catalogv1Schema": {
+      "type": "object",
+      "properties": {
+        "schemaId": {
+          "type": "string",
+          "description": "Unique identifier for the schema."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the schema, relative to parent catalog."
+        },
+        "catalogName": {
+          "type": "string",
+          "description": "Name of parent catalog."
+        },
+        "comment": {
+          "type": "string",
+          "description": "User-provided free-form text description."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The time at which the schema was created."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The time at which the schema was last updated."
+        },
+        "properties": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "A map of key-value properties attached to the securable object."
+        },
+        "fullName": {
+          "type": "string",
+          "title": "Full name of the schema, in form of catalog.schema"
+        }
+      },
+      "description": "Schema is a collection of securable objects such as tables and volumes."
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1Catalog": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "comment": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "properties": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Catalog is a the top-most level of data organization,\nand contains databases/schemas, which contain tables."
+    },
+    "v1ColumnInfo": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "typeText": {
+          "type": "string"
+        },
+        "typeJson": {
+          "type": "string"
+        },
+        "typeName": {
+          "type": "string"
+        },
+        "typePrecision": {
+          "type": "string",
+          "format": "int64"
+        },
+        "typeScale": {
+          "type": "string",
+          "format": "int64"
+        },
+        "typeIntervalType": {
+          "type": "string"
+        },
+        "position": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "comment": {
+          "type": "string"
+        },
+        "nullable": {
+          "type": "boolean"
+        },
+        "partitionIndex": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "v1ColumnTypeName": {
+      "type": "string",
+      "enum": [
+        "COLUMN_TYPE_NAME_UNSPECIFIED",
+        "COLUMN_TYPE_NAME_ARRAY",
+        "COLUMN_TYPE_NAME_BINARY",
+        "COLUMN_TYPE_NAME_BOOLEAN",
+        "COLUMN_TYPE_NAME_CHAR",
+        "COLUMN_TYPE_NAME_DATE",
+        "COLUMN_TYPE_NAME_DECIMAL",
+        "COLUMN_TYPE_NAME_DOUBLE",
+        "COLUMN_TYPE_NAME_FLOAT",
+        "COLUMN_TYPE_NAME_INT",
+        "COLUMN_TYPE_NAME_INTERVAL",
+        "COLUMN_TYPE_NAME_LONG",
+        "COLUMN_TYPE_NAME_MAP",
+        "COLUMN_TYPE_NAME_SHORT",
+        "COLUMN_TYPE_NAME_STRING",
+        "COLUMN_TYPE_NAME_STRUCT",
+        "COLUMN_TYPE_NAME_TIMESTAMP_NTZ",
+        "COLUMN_TYPE_NAME_TIMESTAMP",
+        "COLUMN_TYPE_NAME_USER_DEFINED_TYPE",
+        "COLUMN_TYPE_NAME_TABLE_TYPE",
+        "COLUMN_TYPE_NAME_NULL",
+        "COLUMN_TYPE_NAME_BYTE"
+      ],
+      "default": "COLUMN_TYPE_NAME_UNSPECIFIED"
+    },
+    "v1CreateCatalogRequest": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "comment": {
+          "type": "string"
+        },
+        "properties": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "CreateCatalogRequest is the request message for the CreateCatalog API."
+    },
+    "v1CreateCatalogResponse": {
+      "type": "object",
+      "properties": {
+        "catalog": {
+          "$ref": "#/definitions/v1Catalog"
+        }
+      }
+    },
+    "v1CreateFunctionRequest": {
+      "type": "object",
+      "properties": {
+        "catalogName": {
+          "type": "string",
+          "title": "The name of the catalog where the schema and the function are"
+        },
+        "schemaName": {
+          "type": "string",
+          "title": "The name of the schema where the function is"
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the function, relative to parent schema."
+        },
+        "specificName": {
+          "type": "string",
+          "title": "Specific name of the function; reserved for future use"
+        },
+        "comment": {
+          "type": "string",
+          "title": "The comment attached to the function"
+        },
+        "inputParams": {
+          "$ref": "#/definitions/v1FunctionParameterInfos",
+          "title": "Input params"
+        },
+        "dataType": {
+          "$ref": "#/definitions/v1ColumnTypeName",
+          "title": "Name of the type (INT, STRUCT, MAP, etc.)"
+        },
+        "fullDataType": {
+          "type": "string",
+          "title": "Pretty printed function data type"
+        },
+        "returnParams": {
+          "$ref": "#/definitions/v1FunctionParameterInfos",
+          "title": "Return params"
+        },
+        "routineBody": {
+          "$ref": "#/definitions/v1FunctionLanguage",
+          "description": "Function language. When EXTERNAL is used, the language \nof the routine function should be specified in the \nexternal_language field, and the return_params of the function \ncannot be used (as TABLE return type is not supported), \nand the sql_data_access field must be NO_SQL."
+        },
+        "routineDefinition": {
+          "type": "string",
+          "title": "Function body"
+        },
+        "routineDependencies": {
+          "$ref": "#/definitions/v1DependencyList",
+          "title": "A list of dependencies"
+        },
+        "parameterStyle": {
+          "$ref": "#/definitions/v1ParameterStyle",
+          "description": "Function parameter style. S is the value for SQL."
+        },
+        "isDeterministic": {
+          "type": "boolean",
+          "description": "Whether the function is deterministic."
+        },
+        "sqlDataAccess": {
+          "$ref": "#/definitions/v1SQLDataAccess",
+          "description": "Function SQL data access."
+        },
+        "isNullCall": {
+          "type": "boolean",
+          "description": "Function null call."
+        },
+        "securityType": {
+          "$ref": "#/definitions/v1FunctionSecurityType",
+          "description": "Function security type."
+        },
+        "properties": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Properties of the function."
+        },
+        "externalLanguage": {
+          "type": "string",
+          "description": "External language of the function."
+        }
+      }
+    },
+    "v1CreateFunctionResponse": {
+      "type": "object",
+      "properties": {
+        "function": {
+          "$ref": "#/definitions/v1FunctionInfo"
+        }
+      }
+    },
+    "v1CreateSchemaRequest": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name of the schema, relative to parent catalog."
+        },
+        "catalogName": {
+          "type": "string",
+          "description": "Name of parent catalog."
+        },
+        "comment": {
+          "type": "string",
+          "description": "User-provided free-form text description."
+        },
+        "properties": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "A map of key-value properties attached to the securable object."
+        }
+      }
+    },
+    "v1CreateSchemaResponse": {
+      "type": "object",
+      "properties": {
+        "schema": {
+          "$ref": "#/definitions/omega_catalogv1Schema"
+        }
+      }
+    },
+    "v1CreateTableRequest": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name of the table relative to parent schema."
+        },
+        "catalogName": {
+          "type": "string",
+          "description": "Name of parent catalog."
+        },
+        "schemaName": {
+          "type": "string",
+          "description": "Name of parent schema relative to its parent catalog."
+        },
+        "tableType": {
+          "$ref": "#/definitions/v1TableType",
+          "description": "The type of the table."
+        },
+        "dataSourceFormat": {
+          "$ref": "#/definitions/v1DataSourceFormat",
+          "description": "The format of the data source."
+        },
+        "columns": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ColumnInfo"
+          },
+          "title": "Array of the ColumnInfo definitions of the table's columns"
+        },
+        "storageLocation": {
+          "type": "string",
+          "title": "Storage root URL for table (for MANAGED, EXTERNAL tables)"
+        },
+        "comment": {
+          "type": "string",
+          "description": "User-provided free-form text description."
+        },
+        "properties": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "A map of key-value properties attached to the securable object."
+        }
+      },
+      "description": "CreateTableRequest is the request message for the CreateTable API."
+    },
+    "v1CreateTableResponse": {
+      "type": "object",
+      "properties": {
+        "table": {
+          "$ref": "#/definitions/v1Table"
+        }
+      }
+    },
+    "v1CreateVolumeRequest": {
+      "type": "object",
+      "properties": {
+        "catalogName": {
+          "type": "string",
+          "title": "The name of the catalog where the schema and the volume are"
+        },
+        "schemaName": {
+          "type": "string",
+          "title": "The name of the schema where the volume is"
+        },
+        "name": {
+          "type": "string",
+          "title": "The name of the volume"
+        },
+        "volumeType": {
+          "$ref": "#/definitions/v1VolumeType",
+          "title": "The type of the volume"
+        },
+        "comment": {
+          "type": "string",
+          "title": "The comment attached to the volume"
+        },
+        "storageLocation": {
+          "type": "string",
+          "title": "The storage location of the volume"
+        }
+      },
+      "description": "CreateVolumeRequest is the request message for the CreateVolume API."
+    },
+    "v1CreateVolumeResponse": {
+      "type": "object",
+      "properties": {
+        "volume": {
+          "$ref": "#/definitions/v1Volume"
+        }
+      }
+    },
+    "v1DataSourceFormat": {
+      "type": "string",
+      "enum": [
+        "DATA_SOURCE_FORMAT_UNSPECIFIED",
+        "DATA_SOURCE_FORMAT_CSV",
+        "DATA_SOURCE_FORMAT_JSON",
+        "DATA_SOURCE_FORMAT_PARQUET",
+        "DATA_SOURCE_FORMAT_DELTA",
+        "DATA_SOURCE_FORMAT_ORC",
+        "DATA_SOURCE_FORMAT_TEXT",
+        "DATA_SOURCE_FORMAT_AVRO"
+      ],
+      "default": "DATA_SOURCE_FORMAT_UNSPECIFIED"
+    },
+    "v1DeleteCatalogResponse": {
+      "type": "object"
+    },
+    "v1DeleteFunctionResponse": {
+      "type": "object"
+    },
+    "v1DeleteSchemaResponse": {
+      "type": "object"
+    },
+    "v1DeleteTableResponse": {
+      "type": "object"
+    },
+    "v1DeleteVolumeResponse": {
+      "type": "object"
+    },
+    "v1Dependency": {
+      "type": "object",
+      "properties": {
+        "table": {
+          "$ref": "#/definitions/v1TableDependency"
+        },
+        "function": {
+          "$ref": "#/definitions/v1FunctionDependency"
+        }
+      },
+      "description": "A dependency of a SQL object. Either the `table` field\nor the `function` field must be defined."
+    },
+    "v1DependencyList": {
+      "type": "object",
+      "properties": {
+        "dependencies": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Dependency"
+          },
+          "title": "A list of dependencies"
+        }
+      }
+    },
+    "v1FunctionDependency": {
+      "type": "object",
+      "properties": {
+        "functionFullName": {
+          "type": "string",
+          "title": "Full name of the dependent function, in the form of catalog_name.schema_name.function_name"
+        }
+      }
+    },
+    "v1FunctionInfo": {
+      "type": "object",
+      "properties": {
+        "functionId": {
+          "type": "string",
+          "description": "Unique identifier for the function."
+        },
+        "catalogName": {
+          "type": "string",
+          "title": "The name of the catalog where the schema and the function are"
+        },
+        "schemaName": {
+          "type": "string",
+          "title": "The name of the schema where the function is"
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the function, relative to parent schema."
+        },
+        "specificName": {
+          "type": "string",
+          "title": "Specific name of the function; reserved for future use"
+        },
+        "comment": {
+          "type": "string",
+          "title": "The comment attached to the function"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The time at which the function was created."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The time at which the function was last updated."
+        },
+        "inputParams": {
+          "$ref": "#/definitions/v1FunctionParameterInfos"
+        },
+        "dataType": {
+          "$ref": "#/definitions/v1ColumnTypeName",
+          "title": "Name of the type (INT, STRUCT, MAP, etc.)"
+        },
+        "fullDataType": {
+          "type": "string",
+          "title": "Pretty printed function data type"
+        },
+        "returnParams": {
+          "$ref": "#/definitions/v1FunctionParameterInfos"
+        },
+        "routineBody": {
+          "$ref": "#/definitions/v1FunctionLanguage",
+          "description": "Function language. When EXTERNAL is used, the language \nof the routine function should be specified in the \nexternal_language field, and the return_params of the function \ncannot be used (as TABLE return type is not supported), \nand the sql_data_access field must be NO_SQL."
+        },
+        "routineDefinition": {
+          "type": "string",
+          "title": "Function body"
+        },
+        "routineDependencies": {
+          "$ref": "#/definitions/v1DependencyList",
+          "title": "A list of dependencies"
+        },
+        "parameterStyle": {
+          "$ref": "#/definitions/v1ParameterStyle",
+          "description": "Function parameter style. S is the value for SQL."
+        },
+        "isDeterministic": {
+          "type": "boolean",
+          "description": "Whether the function is deterministic."
+        },
+        "sqlDataAccess": {
+          "$ref": "#/definitions/v1SQLDataAccess",
+          "description": "Function SQL data access."
+        },
+        "isNullCall": {
+          "type": "boolean",
+          "description": "Function null call."
+        },
+        "securityType": {
+          "$ref": "#/definitions/v1FunctionSecurityType",
+          "description": "Function security type."
+        },
+        "properties": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Properties of the function."
+        },
+        "fullName": {
+          "type": "string",
+          "title": "Full name of the function, in form of catalog.schema.function"
+        },
+        "externalLanguage": {
+          "type": "string",
+          "description": "External language of the function."
+        }
+      }
+    },
+    "v1FunctionLanguage": {
+      "type": "string",
+      "enum": [
+        "FUNCTION_LANGUAGE_UNSPECIFIED",
+        "FUNCTION_LANGUAGE_SQL",
+        "FUNCTION_LANGUAGE_EXTERNAL"
+      ],
+      "default": "FUNCTION_LANGUAGE_UNSPECIFIED"
+    },
+    "v1FunctionParameterInfo": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "title": "Name of the parameter"
+        },
+        "typeText": {
+          "type": "string",
+          "description": "Full data type spec, SQL/catalogString text."
+        },
+        "typeJson": {
+          "type": "string",
+          "title": "Full data type sepc, JSON-serialized"
+        },
+        "typeName": {
+          "$ref": "#/definitions/v1ColumnTypeName",
+          "title": "Name of the type (INT, STRUCT, MAP, etc.)"
+        },
+        "typePrecision": {
+          "type": "integer",
+          "format": "int32",
+          "title": "Digits of precision; required on Create for DecimalTypes"
+        },
+        "typeScale": {
+          "type": "integer",
+          "format": "int32",
+          "title": "Digits to the right of decimal; required on Create for DecimalTypes"
+        },
+        "typeIntervalType": {
+          "type": "string",
+          "title": "Format of IntervalType"
+        },
+        "position": {
+          "type": "integer",
+          "format": "int32",
+          "title": "Ordinal position of column (starting at position 0)"
+        },
+        "parameterMode": {
+          "$ref": "#/definitions/v1FunctionParameterMode",
+          "description": "The mode of the function parameter."
+        },
+        "parameterType": {
+          "$ref": "#/definitions/v1FunctionParameterType",
+          "description": "The type of function parameter."
+        },
+        "parameterDefault": {
+          "type": "string",
+          "description": "The default value of the parameter."
+        },
+        "comment": {
+          "type": "string",
+          "description": "User-provided free-form text description."
+        }
+      }
+    },
+    "v1FunctionParameterInfos": {
+      "type": "object",
+      "properties": {
+        "parameters": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1FunctionParameterInfo"
+          },
+          "title": "The array of FunctionParameterInfo definitions of the function's parameters"
+        }
+      }
+    },
+    "v1FunctionParameterMode": {
+      "type": "string",
+      "enum": [
+        "FUNCTION_PARAMETER_MODE_UNSPECIFIED",
+        "FUNCTION_PARAMETER_MODE_IN"
+      ],
+      "default": "FUNCTION_PARAMETER_MODE_UNSPECIFIED"
+    },
+    "v1FunctionParameterType": {
+      "type": "string",
+      "enum": [
+        "FUNCTION_PARAMETER_TYPE_UNSPECIFIED",
+        "FUNCTION_PARAMETER_TYPE_PARAM",
+        "FUNCTION_PARAMETER_TYPE_COLUMN"
+      ],
+      "default": "FUNCTION_PARAMETER_TYPE_UNSPECIFIED"
+    },
+    "v1FunctionSecurityType": {
+      "type": "string",
+      "enum": [
+        "FUNCTION_SECURITY_TYPE_UNSPECIFIED",
+        "FUNCTION_SECURITY_TYPE_DEFINER"
+      ],
+      "default": "FUNCTION_SECURITY_TYPE_UNSPECIFIED"
+    },
+    "v1GetCatalogResponse": {
+      "type": "object",
+      "properties": {
+        "catalog": {
+          "$ref": "#/definitions/v1Catalog"
+        }
+      }
+    },
+    "v1GetFunctionResponse": {
+      "type": "object",
+      "properties": {
+        "function": {
+          "$ref": "#/definitions/v1FunctionInfo"
+        }
+      }
+    },
+    "v1GetSchemaResponse": {
+      "type": "object",
+      "properties": {
+        "schema": {
+          "$ref": "#/definitions/omega_catalogv1Schema"
+        }
+      }
+    },
+    "v1GetTableResponse": {
+      "type": "object",
+      "properties": {
+        "table": {
+          "$ref": "#/definitions/v1Table"
+        }
+      }
+    },
+    "v1GetVolumeResponse": {
+      "type": "object",
+      "properties": {
+        "volume": {
+          "$ref": "#/definitions/v1Volume"
+        }
+      }
+    },
+    "v1ListCatalogsResponse": {
+      "type": "object",
+      "properties": {
+        "catalogs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Catalog"
+          }
+        },
+        "nextPageToken": {
+          "type": "string"
+        }
+      }
+    },
+    "v1ListFunctionsResponse": {
+      "type": "object",
+      "properties": {
+        "functions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1FunctionInfo"
+          }
+        },
+        "nextPageToken": {
+          "type": "string"
+        }
+      }
+    },
+    "v1ListSchemasResponse": {
+      "type": "object",
+      "properties": {
+        "schemas": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/omega_catalogv1Schema"
+          }
+        },
+        "nextPageToken": {
+          "type": "string"
+        }
+      }
+    },
+    "v1ListTablesResponse": {
+      "type": "object",
+      "properties": {
+        "tables": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Table"
+          }
+        },
+        "nextPageToken": {
+          "type": "string"
+        }
+      }
+    },
+    "v1ListVolumesResponse": {
+      "type": "object",
+      "properties": {
+        "volumes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Volume"
+          }
+        },
+        "nextPageToken": {
+          "type": "string"
+        }
+      }
+    },
+    "v1ParameterStyle": {
+      "type": "string",
+      "enum": [
+        "PARAMETER_STYLE_UNSPECIFIED",
+        "PARAMETER_STYLE_SQL"
+      ],
+      "default": "PARAMETER_STYLE_UNSPECIFIED"
+    },
+    "v1SQLDataAccess": {
+      "type": "string",
+      "enum": [
+        "SQL_DATA_ACCESS_UNSPECIFIED",
+        "SQL_DATA_ACCESS_CONTAINS_SQL",
+        "SQL_DATA_ACCESS_NO_SQL",
+        "SQL_DATA_ACCESS_READS_SQL_DATA"
+      ],
+      "default": "SQL_DATA_ACCESS_UNSPECIFIED"
+    },
+    "v1Table": {
+      "type": "object",
+      "properties": {
+        "tableId": {
+          "type": "string",
+          "description": "Unique identifier for the table."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the table, relative to parent schema."
+        },
+        "catalogName": {
+          "type": "string",
+          "description": "Name of parent catalog."
+        },
+        "schemaName": {
+          "type": "string",
+          "description": "Name of parent schema relative to its parent catalog."
+        },
+        "tableType": {
+          "$ref": "#/definitions/v1TableType",
+          "description": "The type of the table."
+        },
+        "dataSourceFormat": {
+          "$ref": "#/definitions/v1DataSourceFormat",
+          "description": "The format of the data source."
+        },
+        "columns": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ColumnInfo"
+          },
+          "title": "Array of the ColumnInfo definitions of the table's columns"
+        },
+        "storageLocation": {
+          "type": "string",
+          "title": "Storage root URL for table (for MANAGED, EXTERNAL tables)"
+        },
+        "comment": {
+          "type": "string",
+          "description": "User-provided free-form text description."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The time at which the table was created."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The time at which the table was last updated."
+        },
+        "properties": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "A map of key-value properties attached to the securable object."
+        }
+      },
+      "description": "Table is a collection of data organized into rows and columns."
+    },
+    "v1TableDependency": {
+      "type": "object",
+      "properties": {
+        "tableFullName": {
+          "type": "string",
+          "title": "Full name of the dependent table, in the form of catalog_name.schema_name.table_name"
+        }
+      }
+    },
+    "v1TableType": {
+      "type": "string",
+      "enum": [
+        "TABLE_TYPE_UNSPECIFIED",
+        "TABLE_TYPE_MANAGED",
+        "TABLE_TYPE_EXTERNAL"
+      ],
+      "default": "TABLE_TYPE_UNSPECIFIED"
+    },
+    "v1UpdateCatalogResponse": {
+      "type": "object",
+      "properties": {
+        "catalog": {
+          "$ref": "#/definitions/v1Catalog"
+        }
+      }
+    },
+    "v1UpdateSchemaResponse": {
+      "type": "object",
+      "properties": {
+        "schema": {
+          "$ref": "#/definitions/omega_catalogv1Schema"
+        }
+      }
+    },
+    "v1UpdateVolumeResponse": {
+      "type": "object",
+      "properties": {
+        "volume": {
+          "$ref": "#/definitions/v1Volume"
+        }
+      }
+    },
+    "v1Volume": {
+      "type": "object",
+      "properties": {
+        "volumeId": {
+          "type": "string",
+          "description": "Unique identifier for the volume."
+        },
+        "catalogName": {
+          "type": "string",
+          "title": "The name of the catalog where the schema and the volume are"
+        },
+        "schemaName": {
+          "type": "string",
+          "title": "The name of the schema where the volume is"
+        },
+        "name": {
+          "type": "string",
+          "title": "The name of the volume"
+        },
+        "fullName": {
+          "type": "string",
+          "title": "Full name of the volume, in form of catalog.schema.volume"
+        },
+        "volumeType": {
+          "$ref": "#/definitions/v1VolumeType",
+          "title": "The type of the volume"
+        },
+        "comment": {
+          "type": "string",
+          "title": "The comment attached to the volume"
+        },
+        "storageLocation": {
+          "type": "string",
+          "title": "The storage location of the volume"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The time at which the volume was created."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The time at which the volume was last updated."
+        }
+      }
+    },
+    "v1VolumeType": {
+      "type": "string",
+      "enum": [
+        "VOLUME_TYPE_UNSPECIFIED",
+        "VOLUME_TYPE_MANAGED",
+        "VOLUME_TYPE_EXTERNAL"
+      ],
+      "default": "VOLUME_TYPE_UNSPECIFIED"
+    }
+  },
+  "externalDocs": {
+    "description": "omega-catalog repository",
+    "url": "https://github.com/zcking/omega-catalog"
+  }
+}

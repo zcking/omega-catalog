@@ -1,0 +1,1151 @@
+syntax = "proto3";
+
+package omega_catalog.v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+/* 
+--------------------------------------------
+| OpenAPI Documentation
+--------------------------------------------
+*/
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+  info: {
+    title: "Omega Catalog API"
+    version: "0.0.1"
+    description: "Omega Catalog: one catalog to rule them all, one catalog to find them, one catalog to bring them all, and in the darkness find them"
+    license: {
+      name: "Apache 2.0"
+      url: "http://www.apache.org/licenses/LICENSE-2.0"
+    }
+  },
+  external_docs: {
+    url: "https://github.com/zcking/omega-catalog";
+    description: "omega-catalog repository";
+  },
+  host: "localhost:8080";
+  schemes: HTTP;
+  schemes: HTTPS;
+  consumes: "application/json";
+  produces: "application/json";
+  tags: {
+    name: "Volumes"
+    description: "Volumes are a Omega Catalog capability for accessing, storing, governing, organizing and processing files. Use cases include running machine learning on unstructured data such as image, audio, video, or PDF files, organizing data sets during the data exploration stages in data science, working with libraries that require access to the local file system on cluster machines, storing library and config files of arbitrary formats such as .whl or .txt centrally and providing secure access across workspaces to it, or transforming and querying non-tabular data files in ETL."
+  };
+  tags: {
+    name: "Catalogs"
+    description: "A catalog is the first layer of Omega Catalog's three-level namespace. It's used to organize your data assets."
+  };
+  tags: {
+    name: "Schemas"
+    description: "A schema (also called a database) is the second layer of Omega Catalog's three-level namespace. A schema organizes tables, volumes and functions."
+  };
+  tags: {
+    name: "Tables"
+    description: "A table resides in the third layer of Omega Catalog's three-level namespace. It contains rows of data. A table can be managed or external."
+  };
+  tags: {
+    name: "Functions"
+    description: "Functions implement User-Defined Functions (UDFs) in Omega Catalog. The function implementation can be a SQL expression/query or a python function, and it can be invoked wherever a table reference is allowed in a query. In Omega Catalog, a function resides at the same level as a table, so it can be referenced with the form catalog_name.schema_name.function_name."
+  };
+};
+
+/* 
+--------------------------------------------
+| RPC Services
+--------------------------------------------
+*/
+
+// OmegaCatalog is the core service that provides the catalog management API.
+service OmegaCatalogService {
+  rpc CreateCatalog(CreateCatalogRequest) returns (CreateCatalogResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/catalogs"
+      body: "*"
+      response_body: "catalog"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["Catalogs"]
+      summary: "Create a new catalog"
+      description: "Create a new catalog instance."
+      responses: {
+        key: "201"
+        value: {
+          description: "The new catalog was successfully created"
+        }
+      }
+    };
+  }
+
+  rpc ListCatalogs(ListCatalogsRequest) returns (ListCatalogsResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/catalogs"
+      response_body: "catalogs"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["Catalogs"]
+      summary: "List catalogs"
+      description: "Lists the available catalogs. There is no guarantee of a specific ordering of the elements in the list."
+      operation_id: "listCatalogs"
+      responses: {
+        key: "200"
+        value: {
+          description: "The catalog list was successfully retrieved"
+        }
+      }
+    };
+  }
+
+  rpc GetCatalog(GetCatalogRequest) returns (GetCatalogResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/catalogs/{name}"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["Catalogs"]
+      summary: "Get a catalog"
+      description: "Get the specified catalog."
+      operation_id: "getCatalog"
+      responses: {
+        key: "200"
+        value: {
+          description: "The catalog was successfully retrieved"
+        }
+      }
+    };
+  }
+
+  rpc UpdateCatalog(UpdateCatalogRequest) returns (UpdateCatalogResponse) {
+    option (google.api.http) = {
+      patch: "/api/v1/catalogs/{name}"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["Catalogs"]
+      summary: "Update a catalog"
+      description: "Update the catalog that matches the specified name."
+      operation_id: "updateCatalog"
+      responses: {
+        key: "200"
+        value: {
+          description: "The catalog was successfully updated"
+        }
+      }
+    };
+  }
+
+  rpc DeleteCatalog(DeleteCatalogRequest) returns (DeleteCatalogResponse) {
+    option (google.api.http) = {
+      delete: "/api/v1/catalogs/{name}"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["Catalogs"]
+      summary: "Delete a catalog"
+      description: "Delete the specified catalog."
+      operation_id: "deleteCatalog"
+      responses: {
+        key: "204"
+        value: {
+          description: "The catalog was successfully deleted"
+        }
+      }
+    };
+  }
+
+  // Schema APIs
+
+  rpc CreateSchema(CreateSchemaRequest) returns (CreateSchemaResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/schemas"
+      body: "*"
+      response_body: "schema"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["Schemas"]
+      summary: "Create a new schema"
+      description: "Create a new schema in the specified catalog."
+      responses: {
+        key: "201"
+        value: {
+          description: "The new schema was successfully created"
+        }
+      }
+    };
+  }
+
+  rpc ListSchemas(ListSchemasRequest) returns (ListSchemasResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/schemas"
+      response_body: "schemas"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["Schemas"]
+      summary: "List schemas"
+      description: "Lists the available schemas under the parent catalog. There is no guarantee of a specific ordering of the elements in the list."
+      operation_id: "listSchemas"
+      responses: {
+        key: "200"
+        value: {
+          description: "The schema list was successfully retrieved"
+        }
+      }
+    };
+  }
+
+  rpc GetSchema(GetSchemaRequest) returns (GetSchemaResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/schemas/{full_name}"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["Schemas"]
+      summary: "Get a schema"
+      description: "Get the specified schema for a catalog."
+      operation_id: "getSchema"
+      responses: {
+        key: "200"
+        value: {
+          description: "The schema was successfully retrieved"
+        }
+      }
+    };
+  }
+
+  rpc UpdateSchema(UpdateSchemaRequest) returns (UpdateSchemaResponse) {
+    option (google.api.http) = {
+      patch: "/api/v1/schemas/{full_name}"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["Schemas"]
+      summary: "Update a schema"
+      description: "Update the specified schema under the specified parent catalog. Currently only the name or the comment of the schema could be updated."
+      operation_id: "updateSchema"
+      responses: {
+        key: "200"
+        value: {
+          description: "The schema was successfully updated"
+        }
+      }
+    };
+  }
+
+  rpc DeleteSchema(DeleteSchemaRequest) returns (DeleteSchemaResponse) {
+    option (google.api.http) = {
+      delete: "/api/v1/schemas/{full_name}"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["Schemas"]
+      summary: "Delete a schema"
+      description: "Delete the specified schema from the parent catalog."
+      operation_id: "deleteSchema"
+      responses: {
+        key: "204"
+        value: {
+          description: "The schema was successfully deleted"
+        }
+      }
+    };
+  }
+
+  // Table APIs
+
+  rpc CreateTable(CreateTableRequest) returns (CreateTableResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/tables"
+      body: "*"
+      response_body: "table"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["Tables"]
+      summary: "Create a new table. WARNING: this API is experimental and will change in future versions"
+      description: "Create a new table. WARNING: this API is experimental and will change in future versions"
+      responses: {
+        key: "201"
+        value: {
+          description: "The new table was successfully created"
+        }
+      }
+    };
+  }
+
+  rpc ListTables(ListTablesRequest) returns (ListTablesResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/tables"
+      response_body: "tables"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["Tables"]
+      summary: "List tables"
+      description: "Gets the list of all available tables under the parent catalog and schema. There is no guarantee of a specific ordering of the elements in the list."
+      operation_id: "listTables"
+      responses: {
+        key: "200"
+        value: {
+          description: "The table list was successfully retrieved"
+        }
+      }
+    };
+  }
+
+  rpc GetTable(GetTableRequest) returns (GetTableResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/tables/{full_name}"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["Tables"]
+      summary: "Get a table"
+      description: "Get the specified table."
+      operation_id: "getTable"
+      responses: {
+        key: "200"
+        value: {
+          description: "The table was successfully retrieved"
+        }
+      }
+    };
+  }
+
+  rpc DeleteTable(DeleteTableRequest) returns (DeleteTableResponse) {
+    option (google.api.http) = {
+      delete: "/api/v1/tables/{full_name}"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["Tables"]
+      summary: "Delete a table"
+      description: "Delete the specified table."
+      operation_id: "deleteTable"
+      responses: {
+        key: "204"
+        value: {
+          description: "The table was successfully deleted"
+        }
+      }
+    };
+  }
+
+  // Volume APIs
+
+  rpc CreateVolume(CreateVolumeRequest) returns (CreateVolumeResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/volumes"
+      body: "*"
+      response_body: "volume"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["Volumes"]
+      summary: "Create a new volume"
+      description: "Create a new volume."
+      responses: {
+        key: "201"
+        value: {
+          description: "The new volume was successfully created"
+        }
+      }
+    };
+  }
+
+  rpc ListVolumes(ListVolumesRequest) returns (ListVolumesResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/volumes"
+      response_body: "volumes"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["Volumes"]
+      summary: "List volumes"
+      description: "Lists the available volumes under the parent catalog and schema. There is no guarantee of a specific ordering of the elements in the list."
+      operation_id: "listVolumes"
+      responses: {
+        key: "200"
+        value: {
+          description: "The volume list was successfully retrieved"
+        }
+      }
+    };
+  }
+
+  // Gets a volume for a specific catalog and schema.
+  rpc GetVolume(GetVolumeRequest) returns (GetVolumeResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/volumes/{name}"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["Volumes"]
+      summary: "Get a volume"
+      description: "Gets a volume for a specific catalog and schema."
+      operation_id: "getVolume"
+      responses: {
+        key: "200"
+        value: {
+          description: "The volume was successfully retrieved"
+        }
+      }
+    };
+  }
+
+  rpc UpdateVolume(UpdateVolumeRequest) returns (UpdateVolumeResponse) {
+    option (google.api.http) = {
+      patch: "/api/v1/volumes/{name}"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["Volumes"]
+      summary: "Update a volume"
+      description: "Update the specified volume under the specified parent catalog and schema. Currently only the name or the comment of the volume could be updated."
+      operation_id: "updateVolume"
+      responses: {
+        key: "200"
+        value: {
+          description: "The volume was successfully updated"
+        }
+      }
+    };
+  }
+
+  rpc DeleteVolume(DeleteVolumeRequest) returns (DeleteVolumeResponse) {
+    option (google.api.http) = {
+      delete: "/api/v1/volumes/{name}"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["Volumes"]
+      summary: "Delete a volume"
+      description: "Delete a volume from the specified catalog and schema."
+      operation_id: "deleteVolume"
+      responses: {
+        key: "204"
+        value: {
+          description: "The volume was successfully deleted"
+        }
+      }
+    };
+  }
+
+  // Function APIs
+
+  rpc CreateFunction(CreateFunctionRequest) returns (CreateFunctionResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/functions"
+      body: "*"
+      response_body: "function"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["Functions"]
+      summary: "Create a new function. WARNING: this API is experimental and will change in future versions."
+      description: "Create a new function. WARNING: this API is experimental and will change in future versions."
+      responses: {
+        key: "201"
+        value: {
+          description: "The new function was successfully created"
+        }
+      }
+    };
+  }
+
+  rpc ListFunctions(ListFunctionsRequest) returns (ListFunctionsResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/functions"
+      response_body: "functions"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["Functions"]
+      summary: "List functions"
+      description: "Lists the available functions under the parent catalog and schema. There is no guarantee of a specific ordering of the elements in the list."
+      operation_id: "listFunctions"
+      responses: {
+        key: "200"
+        value: {
+          description: "The function list was successfully retrieved"
+        }
+      }
+    };
+  }
+
+  rpc GetFunction(GetFunctionRequest) returns (GetFunctionResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/functions/{name}"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["Functions"]
+      summary: "Get a function"
+      description: "Get the specified function from the parent catalog and schema."
+      operation_id: "getFunction"
+      responses: {
+        key: "200"
+        value: {
+          description: "The function was successfully retrieved"
+        }
+      }
+    };
+  }
+
+  rpc DeleteFunction(DeleteFunctionRequest) returns (DeleteFunctionResponse) {
+    option (google.api.http) = {
+      delete: "/api/v1/functions/{name}"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["Functions"]
+      summary: "Delete a function"
+      description: "Delete the specified function from the parent catalog and schema."
+      operation_id: "deleteFunction"
+      responses: {
+        key: "204"
+        value: {
+          description: "The function was successfully deleted"
+        }
+      }
+    };
+  }
+}
+
+/* 
+--------------------------------------------
+| Database Models 
+|
+| TODO: could these be generated from proto?
+--------------------------------------------
+*/
+
+// Catalog is a the top-most level of data organization,
+// and contains databases/schemas, which contain tables.
+message Catalog {
+  string id = 1;
+  string name = 2;
+  string comment = 3;
+  google.protobuf.Timestamp created_at = 4;
+  google.protobuf.Timestamp updated_at = 5;
+  map<string, string> properties = 6;
+}
+
+// Schema is a collection of securable objects such as tables and volumes.
+message Schema {
+  // Unique identifier for the schema.
+  string schema_id = 1;
+  // Name of the schema, relative to parent catalog.
+  string name = 2;
+  // Name of parent catalog.
+  string catalog_name = 3;
+  // User-provided free-form text description.
+  string comment = 4;
+  // The time at which the schema was created.
+  google.protobuf.Timestamp created_at = 5;
+  // The time at which the schema was last updated.
+  google.protobuf.Timestamp updated_at = 6;
+  // A map of key-value properties attached to the securable object.
+  map<string, string> properties = 7;
+  // Full name of the schema, in form of catalog.schema
+  string full_name = 8;
+}
+
+// Table is a collection of data organized into rows and columns.
+message Table {
+  // Unique identifier for the table.
+  string table_id = 1;
+  // Name of the table, relative to parent schema.
+  string name = 2;
+  // Name of parent catalog.
+  string catalog_name = 3;
+  // Name of parent schema relative to its parent catalog.
+  string schema_name = 4;
+  // The type of the table.
+  TableType table_type = 5;
+  // The format of the data source.
+  DataSourceFormat data_source_format = 6;
+  // Array of the ColumnInfo definitions of the table's columns
+  repeated ColumnInfo columns = 7;
+  // Storage root URL for table (for MANAGED, EXTERNAL tables)
+  string storage_location = 8;
+  // User-provided free-form text description.
+  string comment = 9;
+  // The time at which the table was created.
+  google.protobuf.Timestamp created_at = 10;
+  // The time at which the table was last updated.
+  google.protobuf.Timestamp updated_at = 11;
+  // A map of key-value properties attached to the securable object.
+  map<string, string> properties = 12;
+}
+
+enum TableType {
+  TABLE_TYPE_UNSPECIFIED = 0;
+  TABLE_TYPE_MANAGED = 1;
+  TABLE_TYPE_EXTERNAL = 2;
+}
+
+message ColumnInfo {
+  string name = 1;
+  string type_text = 2;
+  string type_json = 3;
+  string type_name = 4;
+  int64 type_precision = 5;
+  int64 type_scale = 6;
+  string type_interval_type = 7;
+  int32 position = 8;
+  string comment = 9;
+  bool nullable = 10;
+  int32 partition_index = 11;
+}
+
+enum DataSourceFormat {
+  DATA_SOURCE_FORMAT_UNSPECIFIED = 0;
+  DATA_SOURCE_FORMAT_CSV = 1;
+  DATA_SOURCE_FORMAT_JSON = 2;
+  DATA_SOURCE_FORMAT_PARQUET = 3;
+  DATA_SOURCE_FORMAT_DELTA = 4;
+  DATA_SOURCE_FORMAT_ORC = 5;
+  DATA_SOURCE_FORMAT_TEXT = 6;
+  DATA_SOURCE_FORMAT_AVRO = 7;
+}
+
+message Volume {
+  // Unique identifier for the volume.
+  string volume_id = 1;
+  // The name of the catalog where the schema and the volume are
+  string catalog_name = 2;
+  // The name of the schema where the volume is
+  string schema_name = 3;
+  // The name of the volume
+  string name = 4;
+  // Full name of the volume, in form of catalog.schema.volume
+  string full_name = 5;
+  // The type of the volume
+  VolumeType volume_type = 6;
+  // The comment attached to the volume
+  string comment = 7;
+  // The storage location of the volume
+  string storage_location = 8;
+  // The time at which the volume was created.
+  google.protobuf.Timestamp created_at = 9;
+  // The time at which the volume was last updated.
+  google.protobuf.Timestamp updated_at = 10;
+}
+
+enum VolumeType {
+  VOLUME_TYPE_UNSPECIFIED = 0;
+  VOLUME_TYPE_MANAGED = 1;
+  VOLUME_TYPE_EXTERNAL = 2;
+}
+
+message FunctionInfo {
+  // Unique identifier for the function.
+  string function_id = 1;
+  // The name of the catalog where the schema and the function are
+  string catalog_name = 2;
+  // The name of the schema where the function is
+  string schema_name = 3;
+  // The name of the function, relative to parent schema.
+  string name = 4;
+  // Specific name of the function; reserved for future use
+  string specific_name = 5;
+  // The comment attached to the function
+  string comment = 6;
+  // The time at which the function was created.
+  google.protobuf.Timestamp created_at = 7;
+  // The time at which the function was last updated.
+  google.protobuf.Timestamp updated_at = 8;
+  FunctionParameterInfos input_params = 9;
+  // Name of the type (INT, STRUCT, MAP, etc.)
+  ColumnTypeName data_type = 10;
+  // Pretty printed function data type
+  string full_data_type = 11;
+  FunctionParameterInfos return_params = 12;
+  // Function language. When EXTERNAL is used, the language 
+  // of the routine function should be specified in the 
+  // external_language field, and the return_params of the function 
+  // cannot be used (as TABLE return type is not supported), 
+  // and the sql_data_access field must be NO_SQL.
+  FunctionLanguage routine_body = 13;
+  // Function body
+  string routine_definition = 14;
+  // A list of dependencies
+  DependencyList routine_dependencies = 15;
+  // Function parameter style. S is the value for SQL.
+  ParameterStyle parameter_style = 16;
+  // Whether the function is deterministic.
+  bool is_deterministic = 17;
+  // Function SQL data access.
+  SQLDataAccess sql_data_access = 18;
+  // Function null call.
+  bool is_null_call = 19;
+  // Function security type.
+  FunctionSecurityType security_type = 20;
+  // Properties of the function.
+  map<string, string> properties = 21;
+  // Full name of the function, in form of catalog.schema.function
+  string full_name = 22;
+  // External language of the function.
+  string external_language = 23;
+}
+
+enum FunctionSecurityType {
+  FUNCTION_SECURITY_TYPE_UNSPECIFIED = 0;
+  FUNCTION_SECURITY_TYPE_DEFINER = 1;
+}
+
+enum SQLDataAccess {
+  SQL_DATA_ACCESS_UNSPECIFIED = 0;
+  SQL_DATA_ACCESS_CONTAINS_SQL = 1;
+  SQL_DATA_ACCESS_NO_SQL = 2;
+  SQL_DATA_ACCESS_READS_SQL_DATA = 3;
+}
+
+enum ParameterStyle {
+  PARAMETER_STYLE_UNSPECIFIED = 0;
+  PARAMETER_STYLE_SQL = 1;
+}
+
+message DependencyList {
+  // A list of dependencies
+  repeated Dependency dependencies = 1;
+}
+
+// A dependency of a SQL object. Either the `table` field
+// or the `function` field must be defined.
+message Dependency {
+  TableDependency table = 1;
+  FunctionDependency function = 2;
+}
+
+message TableDependency {
+  // Full name of the dependent table, in the form of catalog_name.schema_name.table_name
+  string table_full_name = 1;
+}
+
+message FunctionDependency {
+  // Full name of the dependent function, in the form of catalog_name.schema_name.function_name
+  string function_full_name = 1;
+}
+
+message FunctionParameterInfos {
+  // The array of FunctionParameterInfo definitions of the function's parameters
+  repeated FunctionParameterInfo parameters = 1;
+}
+
+message FunctionParameterInfo {
+  // Name of the parameter
+  string name = 1;
+  // Full data type spec, SQL/catalogString text.
+  string type_text = 2;
+  // Full data type sepc, JSON-serialized
+  string type_json = 3;
+  // Name of the type (INT, STRUCT, MAP, etc.)
+  ColumnTypeName type_name = 4;
+  // Digits of precision; required on Create for DecimalTypes
+  int32 type_precision = 5;
+  // Digits to the right of decimal; required on Create for DecimalTypes
+  int32 type_scale = 6;
+  // Format of IntervalType
+  string type_interval_type = 7;
+  // Ordinal position of column (starting at position 0)
+  int32 position = 8;
+  // The mode of the function parameter.
+  FunctionParameterMode parameter_mode = 9;
+  // The type of function parameter.
+  FunctionParameterType parameter_type = 10;
+  // The default value of the parameter.
+  string parameter_default = 11;
+  // User-provided free-form text description.
+  string comment = 12;
+}
+
+enum FunctionLanguage {
+  FUNCTION_LANGUAGE_UNSPECIFIED = 0;
+  FUNCTION_LANGUAGE_SQL = 1;
+  FUNCTION_LANGUAGE_EXTERNAL = 2;
+}
+
+enum FunctionParameterMode {
+  FUNCTION_PARAMETER_MODE_UNSPECIFIED = 0;
+  FUNCTION_PARAMETER_MODE_IN = 1;
+}
+
+enum FunctionParameterType {
+  FUNCTION_PARAMETER_TYPE_UNSPECIFIED = 0;
+  FUNCTION_PARAMETER_TYPE_PARAM = 1;
+  FUNCTION_PARAMETER_TYPE_COLUMN = 2;
+}
+
+enum ColumnTypeName {
+  COLUMN_TYPE_NAME_UNSPECIFIED = 0;
+  COLUMN_TYPE_NAME_ARRAY = 1;
+  COLUMN_TYPE_NAME_BINARY = 2;
+  COLUMN_TYPE_NAME_BOOLEAN = 3;
+  COLUMN_TYPE_NAME_CHAR = 4;
+  COLUMN_TYPE_NAME_DATE = 5;
+  COLUMN_TYPE_NAME_DECIMAL = 6;
+  COLUMN_TYPE_NAME_DOUBLE = 7;
+  COLUMN_TYPE_NAME_FLOAT = 8;
+  COLUMN_TYPE_NAME_INT = 9;
+  COLUMN_TYPE_NAME_INTERVAL = 10;
+  COLUMN_TYPE_NAME_LONG = 11;
+  COLUMN_TYPE_NAME_MAP = 12;
+  COLUMN_TYPE_NAME_SHORT = 13;
+  COLUMN_TYPE_NAME_STRING = 14;
+  COLUMN_TYPE_NAME_STRUCT = 15;
+  COLUMN_TYPE_NAME_TIMESTAMP_NTZ = 16;
+  COLUMN_TYPE_NAME_TIMESTAMP = 17;
+  COLUMN_TYPE_NAME_USER_DEFINED_TYPE = 18;
+  COLUMN_TYPE_NAME_TABLE_TYPE = 19;
+  COLUMN_TYPE_NAME_NULL = 20;
+  COLUMN_TYPE_NAME_BYTE = 21;
+}
+
+/* 
+--------------------------------------------
+| RPC Request and Response Messages
+--------------------------------------------
+*/
+
+// CreateCatalogRequest is the request message for the CreateCatalog API.
+message CreateCatalogRequest {
+  string name = 1;
+  string comment = 2;
+  map<string, string> properties = 3;
+}
+
+message CreateCatalogResponse {
+  Catalog catalog = 1;
+}
+
+message GetCatalogRequest {
+  string name = 1;
+}
+
+message GetCatalogResponse {
+  Catalog catalog = 1;
+}
+
+message ListCatalogsRequest {
+  // Opaque pagination token to go to the next page on previous query 
+  string page_token = 1;
+
+  // Maximum number of catalogs to return.
+  // - when set to a value greater than 0, the page length is the maximum;
+  // - when set to 0, the page length is set to a server configured value;
+  // - when set to a value less than 0, an invalid parameter error is returned;
+  int32 max_results = 2;
+}
+
+message ListCatalogsResponse {
+  repeated Catalog catalogs = 1;
+  string next_page_token = 2;
+}
+
+message UpdateCatalogRequest {
+  // The name of the catalog to update.
+  string name = 1;
+
+  // The new comment for the catalog.
+  string comment = 2;
+  // The new name for the catalog, if renaming it.
+  string new_name = 3;
+  // The new properties for the catalog.
+  map<string, string> properties = 4;
+}
+
+message UpdateCatalogResponse {
+  Catalog catalog = 1;
+}
+
+message DeleteCatalogRequest {
+  // The name of the catalog to delete.
+  string name = 1;
+
+  // If set to true, the catalog will be deleted even if it is not empty.
+  bool force = 2;
+}
+
+message DeleteCatalogResponse {
+}
+
+message CreateSchemaRequest {
+  // Name of the schema, relative to parent catalog.
+  string name = 1;
+  // Name of parent catalog.
+  string catalog_name = 2;
+  // User-provided free-form text description.
+  string comment = 3;
+  // A map of key-value properties attached to the securable object.
+  map<string, string> properties = 4;
+}
+
+message CreateSchemaResponse {
+  Schema schema = 1;
+}
+
+message ListSchemasRequest {
+  // Opaque pagination token to go to the next page on previous query 
+  string page_token = 1;
+
+  // Maximum number of schemas to return.
+  // - when set to a value greater than 0, the page length is the maximum;
+  // - when set to 0, the page length is set to a server configured value;
+  // - when set to a value less than 0, an invalid parameter error is returned;
+  int32 max_results = 2;
+
+  // Name of parent catalog for schemas of interest.
+  string catalog_name = 3;
+}
+
+message ListSchemasResponse {
+  repeated Schema schemas = 1;
+  string next_page_token = 2;
+}
+
+message GetSchemaRequest {
+  // Full name of the schema.
+  string full_name = 1;
+}
+
+message GetSchemaResponse {
+  Schema schema = 1;
+}
+
+message UpdateSchemaRequest {
+  // Full name of the schema.
+  string full_name = 1;
+
+  // The new comment for the schema.
+  string comment = 2;
+  // The new name for the schema, if renaming it.
+  string new_name = 3;
+  // The new properties for the schema.
+  map<string, string> properties = 4;
+}
+
+message UpdateSchemaResponse {
+  Schema schema = 1;
+}
+
+message DeleteSchemaRequest {
+  // Full name of the schema.
+  string full_name = 1;
+}
+
+message DeleteSchemaResponse {
+}
+
+// CreateTableRequest is the request message for the CreateTable API.
+message CreateTableRequest {
+  // Name of the table relative to parent schema.
+  string name = 1;
+  // Name of parent catalog.
+  string catalog_name = 2;
+  // Name of parent schema relative to its parent catalog.
+  string schema_name = 3;
+  // The type of the table.
+  TableType table_type = 4;
+  // The format of the data source.
+  DataSourceFormat data_source_format = 5;
+  // Array of the ColumnInfo definitions of the table's columns
+  repeated ColumnInfo columns = 6;
+  // Storage root URL for table (for MANAGED, EXTERNAL tables)
+  string storage_location = 7;
+  // User-provided free-form text description.
+  string comment = 8;
+  // A map of key-value properties attached to the securable object.
+  map<string, string> properties = 9;
+}
+
+message CreateTableResponse {
+  Table table = 1;
+}
+
+message ListTablesRequest {
+  // Opaque pagination token to go to the next page on previous query 
+  string page_token = 1;
+
+  // Maximum number of tables to return.
+  // - when set to a value greater than 0, the page length is the maximum;
+  // - when set to 0, the page length is set to a server configured value;
+  // - when set to a value less than 0, an invalid parameter error is returned;
+  int32 max_results = 2;
+
+  // Name of parent catalog for tables of interest.
+  string catalog_name = 3;
+
+  // Parent schema of tables.
+  string schema_name = 4;
+}
+
+message ListTablesResponse {
+  repeated Table tables = 1;
+  string next_page_token = 2;
+}
+
+message GetTableRequest {
+  // Full name of the table.
+  string full_name = 1;
+}
+
+message GetTableResponse {
+  Table table = 1;
+}
+
+message DeleteTableRequest {
+  // Full name of the table.
+  string full_name = 1;
+}
+
+message DeleteTableResponse {
+}
+
+// CreateVolumeRequest is the request message for the CreateVolume API.
+message CreateVolumeRequest {
+  // The name of the catalog where the schema and the volume are
+  string catalog_name = 1;
+  // The name of the schema where the volume is
+  string schema_name = 2;
+  // The name of the volume
+  string name = 3;
+  // The type of the volume
+  VolumeType volume_type = 4;
+  // The comment attached to the volume
+  string comment = 5;
+  // The storage location of the volume
+  string storage_location = 6;
+}
+
+message CreateVolumeResponse {
+  Volume volume = 1;
+}
+
+message ListVolumesRequest {
+  // Opaque pagination token to go to the next page on previous query 
+  string page_token = 1;
+
+  // Maximum number of volumes to return.
+  // - when set to a value greater than 0, the page length is the maximum;
+  // - when set to 0, the page length is set to a server configured value;
+  // - when set to a value less than 0, an invalid parameter error is returned;
+  int32 max_results = 2;
+
+  // The identifier of the catalog.
+  string catalog_name = 3;
+
+  // The identifier of the schema.
+  string schema_name = 4;
+}
+
+message ListVolumesResponse {
+  repeated Volume volumes = 1;
+  string next_page_token = 2;
+}
+
+message GetVolumeRequest {
+  // The three-level (fully qualified) name of the volume.
+  string name = 1;
+}
+
+message GetVolumeResponse {
+  Volume volume = 1;
+}
+
+message UpdateVolumeRequest {
+  // The three-level (fully qualified) name of the volume.
+  string name = 1;
+
+  // The new comment for the volume.
+  string comment = 2;
+  // The new name for the volume, if renaming it.
+  string new_name = 3;
+}
+
+message UpdateVolumeResponse {
+  Volume volume = 1;
+}
+
+message DeleteVolumeRequest {
+  // The three-level (fully qualified) name of the volume.
+  string name = 1;
+}
+
+message DeleteVolumeResponse {
+}
+
+message CreateFunctionRequest {
+  // The name of the catalog where the schema and the function are
+  string catalog_name = 1;
+  // The name of the schema where the function is
+  string schema_name = 2;
+  // The name of the function, relative to parent schema.
+  string name = 3;
+  // Specific name of the function; reserved for future use
+  string specific_name = 4;
+  // The comment attached to the function
+  string comment = 5;
+  // Input params
+  FunctionParameterInfos input_params = 6;
+  // Name of the type (INT, STRUCT, MAP, etc.)
+  ColumnTypeName data_type = 7;
+  // Pretty printed function data type
+  string full_data_type = 8;
+  // Return params
+  FunctionParameterInfos return_params = 9;
+  // Function language. When EXTERNAL is used, the language 
+  // of the routine function should be specified in the 
+  // external_language field, and the return_params of the function 
+  // cannot be used (as TABLE return type is not supported), 
+  // and the sql_data_access field must be NO_SQL.
+  FunctionLanguage routine_body = 10;
+  // Function body
+  string routine_definition = 11;
+  // A list of dependencies
+  DependencyList routine_dependencies = 12;
+  // Function parameter style. S is the value for SQL.
+  ParameterStyle parameter_style = 13;
+  // Whether the function is deterministic.
+  bool is_deterministic = 14;
+  // Function SQL data access.
+  SQLDataAccess sql_data_access = 15;
+  // Function null call.
+  bool is_null_call = 16;
+  // Function security type.
+  FunctionSecurityType security_type = 17;
+  // Properties of the function.
+  map<string, string> properties = 18;
+  // External language of the function.
+  string external_language = 19;
+}
+
+message CreateFunctionResponse {
+  FunctionInfo function = 1;
+}
+
+message ListFunctionsRequest {
+  // Opaque pagination token to go to the next page on previous query 
+  string page_token = 1;
+
+  // Maximum number of functions to return.
+  // - when set to a value greater than 0, the page length is the maximum;
+  // - when set to 0, the page length is set to a server configured value;
+  // - when set to a value less than 0, an invalid parameter error is returned;
+  int32 max_results = 2;
+
+  // The identifier of the catalog.
+  string catalog_name = 3;
+
+  // The identifier of the schema.
+  string schema_name = 4;
+}
+
+message ListFunctionsResponse {
+  repeated FunctionInfo functions = 1;
+  string next_page_token = 2;
+}
+
+message GetFunctionRequest {
+  // The three-level (fully qualified) name of the function.
+  string name = 1;
+}
+
+message GetFunctionResponse {
+  FunctionInfo function = 1;
+}
+
+message DeleteFunctionRequest {
+  // The three-level (fully qualified) name of the function.
+  string name = 1;
+}
+
+message DeleteFunctionResponse {
+}

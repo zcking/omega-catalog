@@ -1,0 +1,17 @@
+server:
+  host: "0.0.0.0"
+  port: 8081
+
+rest_gateway:
+  host: "0.0.0.0"
+  port: 8080
+
+database:
+  host: db
+  port: 5432
+  user: omega
+  password: omegapass
+  properties:
+    sslmode: disable
+    dbname: omega
+    TimeZone: UTC
